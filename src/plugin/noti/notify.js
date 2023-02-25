@@ -15,12 +15,7 @@ export const notify = (notification, timeout) => {
 
 export function install(app) {
   app.config.globalProperties.$noti = notify;
-  console.log('notify.js', app.config.globalProperties);
-
+  console.info('notify.js INIT', app.config.globalProperties);
   app.component('Notification', Notification);
   // app.component('NotificationGroup', NotificationGroup);
-
-  // // Compatibility with the old component names
-  // app.component('notification', Notification);
-  // app.component('notificationGroup', NotificationGroup);
 }

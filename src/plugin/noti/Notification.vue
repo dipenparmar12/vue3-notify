@@ -37,12 +37,12 @@ const emits = defineEmits(['close']);
 //     .slice(0, this.maxNotifications);
 // });
 
-const notificationsByGroup = computed(() => {
-  return state.notifications.filter((n) => n.group === state.context.group);
-});
+// const notificationsByGroup = computed(() => {
+//   return state.notifications.filter((n) => n.group === state.context.group);
+// });
 
 function add({ notification, timeout }) {
-  const DEFAULT_TIMEOUT = 3000;
+  const DEFAULT_TIMEOUT = 50000;
   state.notifications.push(notification);
   setTimeout(() => {
     remove(notification.id);
@@ -50,21 +50,28 @@ function add({ notification, timeout }) {
 }
 
 function remove(id) {
+  // console.log('remove()', id);
   const notiIdx = state.notifications.findIndex((n) => n.id === id);
   state.notifications.splice(notiIdx, 1);
 }
 
-function close() {
-  emits('close');
+function close(id) {
+  emits('close'); // TODO
   remove(id);
 }
 
 onMounted(() => Event.on(EventsType.Notify, add));
 onMounted(() => {
-  console.log(props.maxNoti, state.notifications);
+  console.log('onMounted Event.on(EventsType.Notify, add)');
 });
+
+// onMounted(() => console.log(props.maxNoti, state.notifications));
 </script>
 
 <template>
-  <div>Notification</div>
+  <!-- <div>Notification</div> -->
+
+  <slot :notifications="state.notifications" :close="close">
+    Default slot
+  </slot>
 </template>

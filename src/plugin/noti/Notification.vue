@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup>
-import { reactive, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, inject, watchEffect } from 'vue';
 import { Event, EventsType } from './notify';
 
 const props = defineProps({
@@ -22,9 +22,16 @@ const props = defineProps({
   // moveDelay: String,
 });
 const state = reactive({
-  notifications: [],
+  notifications: [
+    // {
+    //   group: '',
+    //   title: 'DefaultTitle',
+    //   id: -1,
+    // },
+  ],
 });
 const emits = defineEmits(['close']);
+const notiGroup = inject('GROUP', '');
 
 // const sortedNotifications = computed(() => {
 //   if (this.context.position === 'bottom') {
@@ -37,12 +44,12 @@ const emits = defineEmits(['close']);
 //     .slice(0, this.maxNotifications);
 // });
 
-// const notificationsByGroup = computed(() => {
-//   return state.notifications.filter((n) => n.group === state.context.group);
-// });
+const notificationsByGroup = computed(() => {
+  return state.notifications.filter((n) => n.group === notiGroup);
+});
 
 function add({ notification, timeout }) {
-  const DEFAULT_TIMEOUT = 50000;
+  const DEFAULT_TIMEOUT = 8000;
   state.notifications.push(notification);
   setTimeout(() => {
     remove(notification.id);
@@ -61,17 +68,26 @@ function close(id) {
 }
 
 onMounted(() => Event.on(EventsType.Notify, add));
-onMounted(() => {
-  console.log('onMounted Event.on(EventsType.Notify, add)');
-});
 
+// onMounted(() => {
+//   console.log('onMounted Event.on(EventsType.Notify, add)');
+//   console.log('notiGroup', { notiGroup });
+// });
+
+watchEffect(() => {
+  console.log('notificationsByGroup', notificationsByGroup.value);
+});
 // onMounted(() => console.log(props.maxNoti, state.notifications));
 </script>
 
 <template>
   <!-- <div>Notification</div> -->
-
-  <slot :notifications="state.notifications" :close="close">
-    Default slot
-  </slot>
+  <!-- <slot :notifications="state.notifications" :close="close">
+    Empty Notifications
+  </slot> -->
+  <div>
+    <slot :notifications="notificationsByGroup" :close="close">
+      <!-- Empty Notifications -->
+    </slot>
+  </div>
 </template>
